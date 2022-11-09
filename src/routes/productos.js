@@ -3,8 +3,10 @@ import * as ProductoController from '../controllers/ProductoController';
 
 const router = Router();
 
-router.get('/search', ProductoController.index);
-router.get('/:id', ProductoController.getProducto);
-router.get('/categoria/:nombre', ProductoController.getProductosByCategoria);
+router.get('/', ProductoController.index);
+router.post('/', ProductoController.store);
+router.get('/:id', ProductoController.show);
+router.put('/:id', ProductoController.update);
+router.delete('/:id', ProductoController.destroy);
 
 export default router;

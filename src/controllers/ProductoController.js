@@ -1,33 +1,16 @@
 import models from '../models';
 import paginate from '../services/paginate';
-import { Op } from 'sequelize';
 
 export const index = async (req, res, next) => {
   try {
     // get the query params
-    const { q, page, limit } = req.query;
-
-    const search = {
-      where: { nombre: { [Op.like]: `%${q}%` }, activo: true }
-    };
-
+    const { page, limit } = req.query;
     const [productos, err] = await paginate(models.Producto, page, limit, search, {
-      attributes: [
-        'id',
-        'nombre',
-        'descripcion',
-        'cantidadDisponible',
-        'detallePromocion',
-        'valorUnitario',
-        'createdAt'
-      ],
-      include: [{ model: models.FotosProducto, attributes: ['path'] }],
+      attributes: ['id', 'nombre', 'cantidadDisponible', 'valorUnitario', 'createdAt'],
       order: [['createdAt', 'DESC']]
     });
 
-    if (err) {
-      return next(err);
-    }
+    if (err) return next(err);
 
     return res.json(productos);
   } catch (err) {
@@ -35,23 +18,10 @@ export const index = async (req, res, next) => {
   }
 };
 
-export const getProducto = async (req, res, next) => {
+export const show = async (req, res, next) => {
   try {
-    const producto = await models.Producto.findByPk(req.params.id, {
-      attributes: { exclude: ['createdAt', 'updatedAt', 'CategoriaId', 'VendedorId', 'activo'] },
-      include: [
-        { model: models.FotosProducto, attributes: ['path'] },
-        { model: models.Categoria, attributes: ['nombre', 'id'] },
-        {
-          model: models.Vendedor,
-          attributes: ['sitioWeb', 'razonSocial']
-        }
-      ]
-    });
-
-    if (!producto) {
-      return res.status(404).json({ message: 'Not Found.' });
-    }
+    const producto = await models.Producto.findOne({ where: { id: req.params.id } });
+    if (!producto) return res.status(400).json({ message: 'Not Found.' });
 
     return res.json(producto);
   } catch (err) {
@@ -59,42 +29,34 @@ export const getProducto = async (req, res, next) => {
   }
 };
 
-export const getProductosByCategoria = async (req, res, next) => {
+export const store = async (req, res, next) => {
   try {
-    const categoria = await models.Categoria.findOne({
-      where: { nombre: req.params.nombre }
-    });
+    const producto = await models.Producto.create(req.body);
 
-    if (!categoria) {
-      return res.status(404).json({ message: 'Not Found.' });
-    }
+    return res.json(producto);
+  } catch (err) {
+    return next(err);
+  }
+};
 
-    // get the query params
-    const { q, page, limit } = req.query;
+export const update = async (req, res, next) => {
+  try {
+    const producto = await models.Producto.findOne({ where: { id: req.params.id } });
+    if (!producto) return res.status(400).json({ message: 'Not Found.' });
 
-    const search = {
-      where: { nombre: { [Op.like]: `%${q}%` }, activo: true, CategoriaId: categoria.id }
-    };
+    const updated = await producto.update(req.body);
 
-    const [productos, err] = await paginate(models.Producto, page, limit, search, {
-      attributes: [
-        'id',
-        'nombre',
-        'descripcion',
-        'cantidadDisponible',
-        'detallePromocion',
-        'valorUnitario',
-        'createdAt'
-      ],
-      include: [{ model: models.FotosProducto, attributes: ['path'] }],
-      order: [['createdAt', 'DESC']]
-    });
+    return res.json(updated);
+  } catch (err) {
+    return next(err);
+  }
+};
+export const destroy = async (req, res, next) => {
+  try {
+    const producto = await models.Producto.destroy({ where: { id: req.params.id } });
+    if (!producto) return res.status(400).json({ message: 'Not Found.' });
 
-    if (err) {
-      return next(err);
-    }
-
-    return res.json(productos);
+    return res.json({ message: '¡Eliminación éxitosa!' });
   } catch (err) {
     return next(err);
   }

@@ -6,7 +6,10 @@ export const development = {
   host: 'localhost',
   ssl: true,
   dialect: 'postgres',
-  logging: false
+  logging: false,
+  dialectOptions: {
+    ssl: { required: true, rejectUnauthorized: false }
+  },
 };
 
 export const production = {
