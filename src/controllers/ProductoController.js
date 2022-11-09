@@ -5,7 +5,7 @@ export const index = async (req, res, next) => {
   try {
     // get the query params
     const { page, limit } = req.query;
-    const [productos, err] = await paginate(models.Producto, page, limit, search, {
+    const [productos, err] = await paginate(models.Producto, page, limit, {
       attributes: ['id', 'nombre', 'cantidadDisponible', 'valorUnitario', 'createdAt'],
       order: [['createdAt', 'DESC']]
     });
