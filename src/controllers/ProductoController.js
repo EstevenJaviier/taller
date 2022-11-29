@@ -51,6 +51,7 @@ export const update = async (req, res, next) => {
     return next(err);
   }
 };
+
 export const destroy = async (req, res, next) => {
   try {
     const producto = await models.Producto.destroy({ where: { id: req.params.id } });

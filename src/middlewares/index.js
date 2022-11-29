@@ -1,7 +1,7 @@
 import { ValidationError } from 'sequelize';
 import { FacebookApiException } from 'fb';
 
-const allowedOrigins = ['http://localhost:4200'];
+const allowedOrigins = ['http://localhost:4200', 'https://crud-angular-ruby.vercel.app'];
 
 export const corsOptions = {
   credentials: true,
